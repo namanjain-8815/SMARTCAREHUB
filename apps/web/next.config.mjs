@@ -12,6 +12,9 @@ const nextConfig = {
   webpack: (config, { isServer, webpack }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
+      wagmi: path.resolve(__dirname, '../../node_modules/wagmi'),
+      '@wagmi/core': path.resolve(__dirname, '../../node_modules/@wagmi/core'),
+      '@tanstack/react-query': path.resolve(__dirname, '../../node_modules/@tanstack/react-query'),
       '@smartcarehub/crypto-core': path.resolve(__dirname, '../../packages/crypto-core/src/index.ts'),
       '@react-native-async-storage/async-storage': false,
     };

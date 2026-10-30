@@ -97,15 +97,16 @@
     - `HealthProver`: `0x75070ad3E4c68c366c85727Ad90c3ED5C83E2f01`
   - Created `apps/web/.env.local` and root `.env` with `NEXT_PUBLIC_USE_MOCK_STORE=false`.
   - Updated all contract hook fallbacks (`useRecordRegistry`, `useDelegationManager`, `useAdherenceLogger`, `useHealthProver`, `useCredentialLocker`) and page references (`reminders`, `vault`, `family`, `credentials`, `prove`) with typed Sepolia addresses.
-  - Resolved production Vercel crash (`Uncaught WagmiProviderNotFoundError: useConfig must be used within WagmiProvider`):
-    - Ensured `apps/web/src/app/layout.tsx` wraps `<AppNav />` and `{children}` inside `<Web3Provider>` in `<body>`.
-    - Maintained `"use client"` at top of `apps/web/src/providers/Web3Provider.tsx` with `WagmiProvider` -> `QueryClientProvider` -> `RainbowKitProvider` wrapping `{children}` without any early `!mounted` returns.
-    - Maintained `"use client"` and mounted guard (`useState(false)` + `useEffect`) in `apps/web/src/components/layout/AppNav.tsx` around `<ConnectButton />` to prevent SSR hydration mismatches.
-    - Verified production build (`npm run build`) succeeded cleanly with exit code 0 across all 8 routes.
-    - Pushed commit to `origin main` for Vercel deployment.
+  - Resolved production Vercel crash and multi-page hydration errors:
+    - Configured Webpack module aliasing in `apps/web/next.config.mjs` for `wagmi`, `@wagmi/core`, and `@tanstack/react-query` to force unified module resolution to root `node_modules`, eliminating duplicate React context instances (`WagmiProviderNotFoundError: useConfig must be used within WagmiProvider`).
+    - Fixed React Error #418 Hydration Mismatch in `apps/web/src/app/credentials/page.tsx` by replacing dynamic `Date.now()` baseline timestamps with static epochs and adding `suppressHydrationWarning` on formatted validity dates.
+    - Added `suppressHydrationWarning` to timestamp cells in `apps/web/src/app/audit/page.tsx`.
+    - Created and committed `apps/web/.env.production` containing active Sepolia contract addresses and verification parameters.
+    - Updated `apps/web/.gitignore` to allow committing `.env.production`.
 - **Verification Results:**
-  - Production build clean across all 8 routes.
-  - Changes pushed to GitHub `main` branch.
+  - `npm run build` in `apps/web` compiled cleanly with exit code 0 across all 8 routes.
+  - Headless Chrome CDP deep automated audit executed across all 7 routes (`/`, `/vault`, `/family`, `/reminders`, `/prove`, `/credentials`, `/audit`) with **0 errors, 0 uncaught exceptions, and 0 hydration warnings**.
+  - All changes pushed to GitHub `main` for Vercel deployment.
 
 ---
 

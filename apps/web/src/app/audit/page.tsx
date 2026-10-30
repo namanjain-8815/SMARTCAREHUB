@@ -294,7 +294,7 @@ export default function AuditPage() {
                     <td className="py-4 px-4 whitespace-nowrap text-xs font-mono text-[var(--text-muted)]">
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5" />
-                        <span>{formatTimestamp(log.timestamp)}</span>
+                        <span suppressHydrationWarning>{formatTimestamp(log.timestamp)}</span>
                       </div>
                     </td>
 

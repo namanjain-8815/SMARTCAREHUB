@@ -56,8 +56,8 @@ const DEFAULT_CREDENTIALS: MockCredential[] = [
     holder: '0x71C...DevPatient',
     issuer: '0x1234567890123456789012345678901234567890',
     credentialType: 'COVID_VACCINATION_VERIFIED',
-    issuedAt: Math.floor(Date.now() / 1000) - 86400 * 60,
-    expiresAt: Math.floor(Date.now() / 1000) + 86400 * 300,
+    issuedAt: 1724800000,
+    expiresAt: 1756000000,
     dataHash: '0x884a20f781bc2619472314e3e3b3a649ef2efb1807d8a983b5d3c8c7720ba314',
     revoked: false,
   },
@@ -66,8 +66,8 @@ const DEFAULT_CREDENTIALS: MockCredential[] = [
     holder: '0x71C...DevPatient',
     issuer: '0x9876543210987654321098765432109876543210',
     credentialType: 'LICENSED_MEDICAL_PRACTITIONER',
-    issuedAt: Math.floor(Date.now() / 1000) - 86400 * 120,
-    expiresAt: Math.floor(Date.now() / 1000) + 86400 * 700,
+    issuedAt: 1719600000,
+    expiresAt: 1780000000,
     dataHash: '0x4f128bc9062aa0d10a248a3d58ef1240c5714088921e16f316f731175e119428',
     revoked: false,
   },
@@ -326,7 +326,7 @@ export default function CredentialsPage() {
                 </div>
                 <div className="flex justify-between text-[var(--text-secondary)]">
                   <span className="text-[var(--text-muted)]">Validity:</span>
-                  <span>Until {formatTimestamp(cred.expiresAt)}</span>
+                  <span suppressHydrationWarning>Until {formatTimestamp(cred.expiresAt)}</span>
                 </div>
               </div>
             </GlassmorphismCard>
