@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Backgrounds */
+  --bg-base:          #0A0F1E;   /* Primary dark background */
+  --bg-surface:       #111827;   /* Card / panel surface */
+  --bg-elevated:      #1F2937;   /* Elevated modal / popover */
+  --bg-glass:         rgba(255, 255, 255, 0.04); /* Glassmorphism */
+
+  /* Accents — Health & Verification */
+  --accent-emerald:   #10B981;   /* Verified health states, confirmed records */
+  --accent-emerald-dim: #064E3B; /* Subtle emerald fill */
+  --accent-teal:      #0D9488;   /* Family circles, active delegation */
+  --accent-teal-dim:  #134E4A;   /* Subtle teal fill */
+
+  /* Accents — Cryptographic Operations */
+  --accent-cyan:      #06B6D4;   /* ZK proof progress, crypto indicators */
+  --accent-cyan-dim:  #083344;   /* Subtle cyan fill */
+  --accent-indigo:    #6366F1;   /* Wallet / signature operations */
+
+  /* Accents — Emergency */
+  --emergency-crimson:     #DC2626; /* Break-glass triggers */
+  --emergency-crimson-dim: #450A0A; /* Subtle crimson fill */
+  --emergency-amber:       #F59E0B; /* Pending auth, warnings */
+  --emergency-amber-dim:   #451A03; /* Subtle amber fill */
+
+  /* Typography */
+  --text-primary:   #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --text-muted:     #4B5563;
+
+  /* Borders */
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-active:  rgba(16, 185, 129, 0.4);
+  --border-crypto:  rgba(6, 182, 212, 0.4);
+  --border-emergency: rgba(220, 38, 38, 0.5);
+
+  /* Typography Scale */
+  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-sans:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Light mode overrides */
+[data-theme="light"] {
+  --bg-base:      #F8FAFC;
+  --bg-surface:   #FFFFFF;
+  --bg-elevated:  #F1F5F9;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted:   #94A3B8;
+  --border-default: rgba(0, 0, 0, 0.08);
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-emerald-dim);
+}

@@ -1,0 +1,12 @@
+node_modules/
+.next/
+dist/
+artifacts/
+cache/
+.env.local
+*.ptau
+*.zkey
+*.r1cs
+*.wtns
+build/
+.turbo/

@@ -1,0 +1,21 @@
+{
+  "name": "smartcarehub",
+  "private": true,
+  "packageManager": "npm@10.9.8",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.4"
+  },
+  "overrides": {
+    "wagmi": "2.19.5"
+  }
+}
