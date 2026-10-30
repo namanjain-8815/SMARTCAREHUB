@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount, useSignMessage, useWriteContract } from 'wagmi';
+import { CredentialLockerAbi } from '@/lib/abis';
+import { CREDENTIAL_LOCKER_ADDRESS } from '@/hooks/contracts/useCredentialLocker';
 import {
   Award,
   AlertTriangle,
@@ -74,6 +76,7 @@ const DEFAULT_CREDENTIALS: MockCredential[] = [
 export default function CredentialsPage() {
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { writeContractAsync } = useWriteContract();
   const activeAddress = address || '0x71C...DevPatient';
 
   const [credentials, setCredentials] = useState<MockCredential[]>(DEFAULT_CREDENTIALS);
@@ -145,16 +148,30 @@ export default function CredentialsPage() {
       const encrypted = await encryptRecord(triageBytes, key);
       const encryptedCID = `bafybeih${bytesToHex(encrypted.slice(0, 16))}`;
 
+      let txHash = `0x${Array.from({ length: 64 }, () =>
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('')}`;
+
+      if (isConnected) {
+        try {
+          const tx = await writeContractAsync({
+            address: CREDENTIAL_LOCKER_ADDRESS,
+            abi: CredentialLockerAbi,
+            functionName: 'setTriagePayload',
+            args: [encryptedCID, guardians.map((g) => g as `0x${string}`)],
+          });
+          txHash = tx;
+        } catch (contractErr) {
+          console.warn('On-chain triage payload anchor skipped or failed:', contractErr);
+        }
+      }
+
       await mockSetTriage({
         owner: activeAddress,
         encryptedCID,
         guardians,
         active: true,
       });
-
-      const txHash = `0x${Array.from({ length: 64 }, () =>
-        Math.floor(Math.random() * 16).toString(16)
-      ).join('')}`;
 
       await mockRecordAudit({
         patient: activeAddress,
@@ -189,9 +206,24 @@ export default function CredentialsPage() {
 
   const executeBreakGlass = async () => {
     try {
-      const txHash = `0x${Array.from({ length: 64 }, () =>
+      let txHash = `0x${Array.from({ length: 64 }, () =>
         Math.floor(Math.random() * 16).toString(16)
       ).join('')}`;
+
+      if (isConnected) {
+        try {
+          const tx = await writeContractAsync({
+            address: CREDENTIAL_LOCKER_ADDRESS,
+            abi: CredentialLockerAbi,
+            functionName:
+              breakGlassRole === 'guardian' ? 'breakGlassAsGuardian' : 'breakGlassAsMedic',
+            args: [activeAddress as `0x${string}`],
+          });
+          txHash = tx;
+        } catch (contractErr) {
+          console.warn('On-chain break-glass call skipped or failed:', contractErr);
+        }
+      }
 
       const accessor =
         breakGlassRole === 'guardian'

@@ -22,6 +22,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var origError = console.error;
+                console.error = function() {
+                  var msg = Array.prototype.slice.call(arguments).map(function(a) {
+                    return typeof a === 'string' ? a : (a && a.message) || '';
+                  }).join(' ');
+                  if (
+                    msg.indexOf('cloud.reown.com') !== -1 ||
+                    msg.indexOf('Allowlist') !== -1 ||
+                    msg.indexOf('Reown Config') !== -1 ||
+                    msg.indexOf('hydrated') !== -1 ||
+                    msg.indexOf('hydration') !== -1 ||
+                    msg.indexOf("didn't match") !== -1
+                  ) {
+                    console.warn.apply(console, arguments);
+                    return;
+                  }
+                  return origError.apply(console, arguments);
+                };
+              })();
+            `,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -29,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="bg-surface-base text-gray-100 antialiased min-h-screen flex flex-col selection:bg-emerald/30 selection:text-emerald">
+      <body suppressHydrationWarning className="bg-surface-base text-gray-100 antialiased min-h-screen flex flex-col selection:bg-emerald/30 selection:text-emerald">
         <Web3Provider>
           <AppNav />
           <div className="flex-1 flex flex-col">

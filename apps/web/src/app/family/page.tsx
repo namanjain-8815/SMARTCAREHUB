@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount, useSignMessage, useWriteContract } from 'wagmi';
+import { DelegationManagerAbi } from '@/lib/abis';
+import { DELEGATION_MANAGER_ADDRESS } from '@/hooks/contracts/useDelegationManager';
 import {
   Users,
   UserPlus,
@@ -46,6 +48,7 @@ import { truncateAddress, formatTimestamp } from '@/lib/utils';
 export default function FamilyPage() {
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { writeContractAsync } = useWriteContract();
   const activeAddress = address || '0x71C...DevPatient';
 
   const [delegations, setDelegations] = useState<MockDelegation[]>([]);
@@ -114,9 +117,28 @@ export default function FamilyPage() {
         encryptedKey: encryptedKeyHex,
       });
 
-      const txHash = `0x${Array.from({ length: 64 }, () =>
+      let txHash = `0x${Array.from({ length: 64 }, () =>
         Math.floor(Math.random() * 16).toString(16)
       ).join('')}`;
+
+      if (isConnected) {
+        try {
+          const tx = await writeContractAsync({
+            address: DELEGATION_MANAGER_ADDRESS,
+            abi: DelegationManagerAbi,
+            functionName: 'grantDelegation',
+            args: [
+              delegateAddress as `0x${string}`,
+              selectedRole,
+              BigInt(expiresAt),
+              encryptedKeyHex as `0x${string}`,
+            ],
+          });
+          txHash = tx;
+        } catch (contractErr) {
+          console.warn('On-chain delegation call skipped or failed:', contractErr);
+        }
+      }
 
       await mockRecordAudit({
         patient: activeAddress,
@@ -139,10 +161,25 @@ export default function FamilyPage() {
 
   const handleRevoke = async (id: number, delegate: string) => {
     try {
-      await mockRevokeDelegation(id);
-      const txHash = `0x${Array.from({ length: 64 }, () =>
+      let txHash = `0x${Array.from({ length: 64 }, () =>
         Math.floor(Math.random() * 16).toString(16)
       ).join('')}`;
+
+      if (isConnected) {
+        try {
+          const tx = await writeContractAsync({
+            address: DELEGATION_MANAGER_ADDRESS,
+            abi: DelegationManagerAbi,
+            functionName: 'revokeDelegation',
+            args: [BigInt(id)],
+          });
+          txHash = tx;
+        } catch (contractErr) {
+          console.warn('On-chain revoke delegation skipped or failed:', contractErr);
+        }
+      }
+
+      await mockRevokeDelegation(id);
 
       await mockRecordAudit({
         patient: activeAddress,

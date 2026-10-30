@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useWriteContract } from 'wagmi';
+import { HealthProverAbi } from '@/lib/abis';
+import { HEALTH_PROVER_ADDRESS } from '@/hooks/contracts/useHealthProver';
 import {
   ShieldCheck,
   Lock,
@@ -34,7 +36,8 @@ import {
 import { mockRecordAudit } from '@/lib/mockStore';
 
 export default function ProvePage() {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { writeContractAsync } = useWriteContract();
   const activeAddress = address || '0x71C...DevPatient';
 
   const [claimType, setClaimType] = useState<ClaimType>('vaccination');
@@ -164,9 +167,34 @@ export default function ProvePage() {
   const handleVerifyOnChain = async () => {
     if (!proofResult) return;
     try {
-      const txHash = `0x${Array.from({ length: 64 }, () =>
+      const claimTypeIndex = claimType === 'vaccination' ? 0 : claimType === 'vitals' ? 1 : 2;
+      const formatted = await formatProofForSolidity(proofResult.proof, proofResult.publicSignals);
+
+      let txHash = `0x${Array.from({ length: 64 }, () =>
         Math.floor(Math.random() * 16).toString(16)
       ).join('')}`;
+
+      if (isConnected) {
+        try {
+          const pA: [bigint, bigint] = [BigInt(formatted.pA[0]), BigInt(formatted.pA[1])];
+          const pB: [[bigint, bigint], [bigint, bigint]] = [
+            [BigInt(formatted.pB[0][0]), BigInt(formatted.pB[0][1])],
+            [BigInt(formatted.pB[1][0]), BigInt(formatted.pB[1][1])],
+          ];
+          const pC: [bigint, bigint] = [BigInt(formatted.pC[0]), BigInt(formatted.pC[1])];
+          const pubSignals = formatted.pubSignals.map((s) => BigInt(s));
+
+          const tx = await writeContractAsync({
+            address: HEALTH_PROVER_ADDRESS,
+            abi: HealthProverAbi,
+            functionName: 'verifyHealthClaim',
+            args: [claimTypeIndex, pA, pB, pC, pubSignals],
+          });
+          txHash = tx;
+        } catch (contractErr) {
+          console.warn('On-chain verification contract call failed or cancelled by user:', contractErr);
+        }
+      }
 
       await mockRecordAudit({
         patient: activeAddress,

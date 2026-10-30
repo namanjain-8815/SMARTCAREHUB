@@ -2,7 +2,7 @@ import { useWriteContract, useReadContract, useWatchContractEvent } from 'wagmi'
 import { AdherenceLoggerAbi } from '@/lib/abis';
 
 export const ADHERENCE_LOGGER_ADDRESS = (process.env.NEXT_PUBLIC_ADHERENCE_LOGGER_ADDRESS ||
-  '0x3333333333333333333333333333333333333333') as `0x${string}`;
+  '0x47F894105De0c6cBffeFE297Ce60Bcd771235Cad') as `0x${string}`;
 
 export function useLogDosage() {
   return useWriteContract();

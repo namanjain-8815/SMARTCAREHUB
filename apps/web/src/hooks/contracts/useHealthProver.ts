@@ -2,7 +2,7 @@ import { useWriteContract, useWatchContractEvent } from 'wagmi';
 import { HealthProverAbi } from '@/lib/abis';
 
 export const HEALTH_PROVER_ADDRESS = (process.env.NEXT_PUBLIC_HEALTH_PROVER_ADDRESS ||
-  '0x4444444444444444444444444444444444444444') as `0x${string}`;
+  '0x75070ad3E4c68c366c85727Ad90c3ED5C83E2f01') as `0x${string}`;
 
 export function useVerifyHealthClaim() {
   return useWriteContract();

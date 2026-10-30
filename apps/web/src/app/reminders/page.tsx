@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useAccount, useWalletClient, useWriteContract } from 'wagmi';
+import { AdherenceLoggerAbi } from '@/lib/abis';
+import { ADHERENCE_LOGGER_ADDRESS } from '@/hooks/contracts/useAdherenceLogger';
 import {
   Pill,
   Clock,
@@ -73,6 +75,7 @@ const DEFAULT_MEDICATIONS: Medication[] = [
 export default function RemindersPage() {
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const { writeContractAsync } = useWriteContract();
   const activeAddress = address || '0x71C...DevPatient';
 
   const [medications, setMedications] = useState<Medication[]>(DEFAULT_MEDICATIONS);
@@ -148,7 +151,7 @@ export default function RemindersPage() {
       if (isConnected && walletClient) {
         try {
           const contractAddress = (process.env.NEXT_PUBLIC_ADHERENCE_LOGGER_ADDRESS ||
-            '0x3333333333333333333333333333333333333333') as `0x${string}`;
+            '0x47F894105De0c6cBffeFE297Ce60Bcd771235Cad') as `0x${string}`;
           signature = await signDosageEvent(walletClient, contractAddress, payload);
         } catch (err) {
           console.warn('Wallet signing cancelled, falling back to mock signature', err);
@@ -167,9 +170,23 @@ export default function RemindersPage() {
         confirmedAt: Number(confirmedAt),
       });
 
-      const txHash = `0x${Array.from({ length: 64 }, () =>
+      let txHash = `0x${Array.from({ length: 64 }, () =>
         Math.floor(Math.random() * 16).toString(16)
       ).join('')}`;
+
+      if (isConnected && signature && signature !== '0x' + 'ff'.repeat(65)) {
+        try {
+          const tx = await writeContractAsync({
+            address: ADHERENCE_LOGGER_ADDRESS,
+            abi: AdherenceLoggerAbi,
+            functionName: 'logDosage',
+            args: [confirmingMed.id, scheduledAt, confirmedAt, signature as `0x${string}`],
+          });
+          txHash = tx;
+        } catch (contractErr) {
+          console.warn('On-chain logDosage skipped or failed:', contractErr);
+        }
+      }
 
       await mockRecordAudit({
         patient: activeAddress,

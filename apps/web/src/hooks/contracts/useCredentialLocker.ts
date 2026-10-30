@@ -2,7 +2,7 @@ import { useWriteContract, useReadContract, useWatchContractEvent } from 'wagmi'
 import { CredentialLockerAbi } from '@/lib/abis';
 
 export const CREDENTIAL_LOCKER_ADDRESS = (process.env.NEXT_PUBLIC_CREDENTIAL_LOCKER_ADDRESS ||
-  '0x5555555555555555555555555555555555555555') as `0x${string}`;
+  '0xca7075c1150f3Db3cd6Fa9546Bf38aE18ff18DD3') as `0x${string}`;
 
 export function useSetTriagePayload() {
   return useWriteContract();

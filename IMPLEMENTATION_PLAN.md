@@ -110,8 +110,17 @@
 
 ---
 
-## 4. Immediate Next Steps
-1. All 35 tasks across Phase 0 through Phase 5 are 100% complete and verified.
-2. For local demonstration: run `npm run start` in `apps/web` or `turbo run dev` from root.
-3. For live testnet deployment: configure `SEPOLIA_RPC_URL` and `SEPOLIA_PRIVATE_KEY` in `.env` and execute `npx hardhat ignition deploy ignition/modules/SmartCareHub.ts --network sepolia` from `packages/contracts`.
+## 4. Immediate Next Steps & Live Sepolia Deployment
+1. **Live Sepolia Smart Contracts:** Deployed via Remix IDE and verified:
+   - `RecordRegistry`: `0x712A6c93B844102113FEc1B65f63B718a3ED60D1`
+   - `DelegationManager`: `0xCc8a8408203d25581ad3055753cD46D8EA56E832`
+   - `AdherenceLogger`: `0x47F894105De0c6cBffeFE297Ce60Bcd771235Cad`
+   - `CredentialLocker`: `0xca7075c1150f3Db3cd6Fa9546Bf38aE18ff18DD3`
+   - `HealthProver`: `0x75070ad3E4c68c366c85727Ad90c3ED5C83E2f01`
+   - `VaccinationRangeVerifier`: `0x7fF66B94e6FC78Ca02757738D5249FC6F41D7993`
+   - `VitalsRangeVerifier`: `0x917267678cFf121b0Aa96B30Ccb0E9be8f05316a`
+   - `AgeThresholdVerifier`: `0x1bA4553E6ad83f9f83Cfb89d672d0b551c158CA6`
+2. **Environment & Live Mode:** `apps/web/.env.local` configured with `NEXT_PUBLIC_USE_MOCK_STORE=false`.
+3. **Active Server:** Development server running on `http://localhost:3000` via `npm run dev`.
+4. **All 35 Tasks:** Complete and verified across all phases.
 

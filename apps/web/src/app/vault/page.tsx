@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount, useSignMessage, useWriteContract } from 'wagmi';
+import { RecordRegistryAbi } from '@/lib/abis';
+import { RECORD_REGISTRY_ADDRESS } from '@/hooks/contracts/useRecordRegistry';
 import {
   Shield,
   Upload,
@@ -40,6 +42,7 @@ import { truncateHash, truncateAddress, formatTimestamp } from '@/lib/utils';
 export default function VaultPage() {
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { writeContractAsync } = useWriteContract();
 
   // Active encryption key derived from signature
   const [masterKey, setMasterKey] = useState<CryptoKey | null>(null);
@@ -135,8 +138,23 @@ export default function VaultPage() {
         },
       };
 
+      let txHash: string = contentHashHex;
+      if (isConnected) {
+        try {
+          const tx = await writeContractAsync({
+            address: RECORD_REGISTRY_ADDRESS,
+            abi: RecordRegistryAbi,
+            functionName: 'anchorRecord',
+            args: [contentHashHex, mockCID],
+          });
+          txHash = tx;
+        } catch (contractErr) {
+          console.warn('On-chain anchor skipped or failed (local state preserved):', contractErr);
+        }
+      }
+
       await mockSaveRecord(newRecord);
-      setLatestTx(contentHashHex);
+      setLatestTx(txHash);
       setRecordTitle('');
       setRecordContent('');
       setUploadModalOpen(false);
@@ -182,6 +200,20 @@ export default function VaultPage() {
 
   // Revoke record
   const handleRevoke = async (contentHash: string) => {
+    const recordIndex = records.findIndex((r) => r.contentHash === contentHash);
+    if (isConnected && recordIndex >= 0) {
+      try {
+        const tx = await writeContractAsync({
+          address: RECORD_REGISTRY_ADDRESS,
+          abi: RecordRegistryAbi,
+          functionName: 'revokeRecord',
+          args: [BigInt(recordIndex)],
+        });
+        setLatestTx(tx);
+      } catch (contractErr) {
+        console.warn('On-chain revoke skipped or failed:', contractErr);
+      }
+    }
     await mockRevokeRecord(contentHash);
     await loadRecords();
   };

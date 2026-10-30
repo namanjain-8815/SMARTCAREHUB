@@ -2,7 +2,7 @@ import { useWriteContract, useReadContract, useWatchContractEvent } from 'wagmi'
 import { DelegationManagerAbi } from '@/lib/abis';
 
 export const DELEGATION_MANAGER_ADDRESS = (process.env.NEXT_PUBLIC_DELEGATION_MANAGER_ADDRESS ||
-  '0x2222222222222222222222222222222222222222') as `0x${string}`;
+  '0xCc8a8408203d25581ad3055753cD46D8EA56E832') as `0x${string}`;
 
 export function useGrantDelegation() {
   return useWriteContract();
