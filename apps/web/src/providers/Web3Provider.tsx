@@ -61,6 +61,7 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
       })
   );
 
+  // WagmiProvider wraps QueryClientProvider which wraps RainbowKitProvider and children directly
   return (
     <WagmiProvider config={config as any}>
       <QueryClientProvider client={queryClient}>

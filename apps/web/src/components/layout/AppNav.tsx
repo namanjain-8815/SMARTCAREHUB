@@ -31,8 +31,8 @@ const NAV_LINKS = [
 export function AppNav() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Guard wallet button rendering to prevent SSR hydration mismatches
   const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
     setMounted(true);
   }, []);

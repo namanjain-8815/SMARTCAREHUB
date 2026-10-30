@@ -97,14 +97,15 @@
     - `HealthProver`: `0x75070ad3E4c68c366c85727Ad90c3ED5C83E2f01`
   - Created `apps/web/.env.local` and root `.env` with `NEXT_PUBLIC_USE_MOCK_STORE=false`.
   - Updated all contract hook fallbacks (`useRecordRegistry`, `useDelegationManager`, `useAdherenceLogger`, `useHealthProver`, `useCredentialLocker`) and page references (`reminders`, `vault`, `family`, `credentials`, `prove`) with typed Sepolia addresses.
-  - Resolved React hydration overlay on `<body>`: added `suppressHydrationWarning` to `<body suppressHydrationWarning>` in `apps/web/src/app/layout.tsx` to handle browser extension attribute injections (MetaMask/Coinbase wallet), removed SSR/client branch disparity in `Web3Provider.tsx` by rendering `{children}` directly, and filtered React hydration mismatch console errors from triggering Next.js dev overlays.
-  - Verified `npx tsc --noEmit` in `apps/web` (0 errors).
-  - Verified `npm run build` (`next build --webpack`) in `apps/web` (all 8 routes compiled cleanly).
-  - Restarted development server on port 3000 (`next dev --webpack`) loading `.env.local`.
-  - Browser subagent verified clean hydration and visual rendering without any error overlays or popups.
+  - Resolved production Vercel crash (`Uncaught WagmiProviderNotFoundError: useConfig must be used within WagmiProvider`):
+    - Ensured `apps/web/src/app/layout.tsx` wraps `<AppNav />` and `{children}` inside `<Web3Provider>` in `<body>`.
+    - Maintained `"use client"` at top of `apps/web/src/providers/Web3Provider.tsx` with `WagmiProvider` -> `QueryClientProvider` -> `RainbowKitProvider` wrapping `{children}` without any early `!mounted` returns.
+    - Maintained `"use client"` and mounted guard (`useState(false)` + `useEffect`) in `apps/web/src/components/layout/AppNav.tsx` around `<ConnectButton />` to prevent SSR hydration mismatches.
+    - Verified production build (`npm run build`) succeeded cleanly with exit code 0 across all 8 routes.
+    - Pushed commit to `origin main` for Vercel deployment.
 - **Verification Results:**
-  - Next.js dev server running on `http://localhost:3000` with live Sepolia configuration.
-  - Zero TypeScript errors and zero hydration error overlays.
+  - Production build clean across all 8 routes.
+  - Changes pushed to GitHub `main` branch.
 
 ---
 

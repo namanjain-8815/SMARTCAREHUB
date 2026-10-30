@@ -56,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body suppressHydrationWarning className="bg-surface-base text-gray-100 antialiased min-h-screen flex flex-col selection:bg-emerald/30 selection:text-emerald">
+        {/* Web3Provider wraps AppNav and children inside body */}
         <Web3Provider>
           <AppNav />
           <div className="flex-1 flex flex-col">
