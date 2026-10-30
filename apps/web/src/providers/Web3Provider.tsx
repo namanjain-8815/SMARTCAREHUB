@@ -46,7 +46,7 @@ const config = getDefaultConfig({
       wallets: [injectedWallet, metaMaskWallet, coinbaseWallet, rabbyWallet],
     },
   ],
-  ssr: false,
+  ssr: true,
 });
 
 export function Web3Provider({ children }: { children: React.ReactNode }) {
